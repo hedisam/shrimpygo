@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/hedisam/shrimpygo"
+	"github.com/hedisam/shrimpygo/examples/config"
 	"log"
 )
 
-const (
-	// todo: read from a config file or from env
-	apiKey    = ""
-	secretKey = ""
-)
-
 func main() {
-	client, err := shrimpygo.NewShrimpyClient(apiKey, secretKey)
+	cfg, err := config.Read("examples/config/config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client, err := shrimpygo.NewShrimpyClient(cfg.APIKey, cfg.SecretKey)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ws.Subscribe("bbo", "coinbasepro", "btc-usd")
+	ws.Subscribe("orderbook", "coinbasepro", "btc-usd")
 
 	for msg := range ws.Stream() {
 		switch message := msg.(type) {
@@ -35,6 +35,7 @@ func main() {
 			if message.Snapshot {
 				continue
 			}
+			fmt.Println("=========================================")
 			fmt.Println(message)
 		case error:
 			log.Println("error from shrimpy: ", message)
