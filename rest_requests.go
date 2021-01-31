@@ -22,8 +22,8 @@ func Get(ctx context.Context, path string, cfg *shrimpyConfig) ([]byte, error) {
 	req.Header.Add(apiKeyHeader, cfg.APIKey())
 	req.Header.Add(apiNonceHeader, fmt.Sprint(nonce))
 	req.Header.Add(apiSigHeader, signature)
-	//req.Header.Add("Content-Type", "application/json")
 
+	// todo: use the context
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("http request failed: %w", err)

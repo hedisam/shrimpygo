@@ -38,11 +38,11 @@ type Error struct {
 }
 
 type unknownData struct {
-	// having an Exchange field shows that we have a Price message
-	Exchange string `json:"exchange"`
+	// having an Channel field shows it's not a ping nor an error. then we can decode the data based on the channel.
+	Channel string `json:"exchange"`
 	// both error and ping messages come with a Type field
 	Type string `json:"type"`
-	// ping pongListener messages come with a Data field
+	// ping messages come with a Data field
 	Data int64 `json:"data"`
 	// Code and Message are expected with an error message
 	Code int64 `json:"code"`

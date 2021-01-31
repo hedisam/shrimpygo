@@ -30,12 +30,12 @@ func createStream(ctx context.Context, config *shrimpyConfig) (*wsStream, error)
 	}
 
 	stream := &wsStream{
-		conn:         wsConn,
-		data:         make(chan []byte),
-		errors:       make(chan error),
-		upstreamChan: make(chan interface{}),
-		wg:           sync.WaitGroup{},
 		ctx:          ctx,
+		conn:         wsConn,
+		wg:           sync.WaitGroup{},
+		errors:       make(chan error),
+		data:         make(chan []byte),
+		upstreamChan: make(chan interface{}),
 	}
 
 	stream.start()
@@ -56,6 +56,14 @@ func (s *wsStream) send(msg interface{}) {
 		case s.upstreamChan <- msg:
 		}
 	}()
+}
+
+func (s *wsStream) dataChan() <-chan []byte {
+	return s.data
+}
+
+func (s *wsStream) errorsChan() <-chan error {
+	return s.errors
 }
 
 // downstream listens for incoming messages and push them to the data channel.

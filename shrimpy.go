@@ -39,5 +39,5 @@ func (shrimpy *Shrimpy) Websocket(ctx context.Context) (*WSConnection, error) {
 		return nil, fmt.Errorf("failed to create a websocket stream: %w", err)
 	}
 
-	return &WSConnection{stream: stream}, nil
+	return &WSConnection{stream: stream, ctx: ctx}, nil
 }
