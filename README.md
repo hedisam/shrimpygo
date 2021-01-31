@@ -1,2 +1,4 @@
 # shrimpygo
-Shrimpy client for Golang - https://developers.shrimpy.io/
+Golang Shrimpy client - https://developers.shrimpy.io/
+
+* Websocket subscriptions

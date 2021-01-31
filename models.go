@@ -1,23 +1,53 @@
 package shrimpygo
 
-type PriceQuote struct {
+type OrderBook struct {
+	Exchange string           `json:"exchange"`
+	Pair     string           `json:"pair"`
+	Channel  string           `json:"channel"`
+	Snapshot bool             `json:"snapshot"`
+	Sequence int64            `json:"sequence"`
+	Content  OrderBookContent `json:"content"`
+}
+
+type OrderBookContent struct {
+	Asks []OrderBookItem `json:"asks"`
+	Bids []OrderBookItem `json:"bids"`
+}
+
+type OrderBookItem struct {
 	Price    string `json:"Price"`
 	Quantity string `json:"quantity"`
 }
 
-type PriceContent struct {
-	Asks []PriceQuote `json:"asks"`
-	Bids []PriceQuote `json:"bids"`
-}
+/////////////////////////////////////////
 
-type PriceData struct {
+type Trades struct {
 	Exchange string       `json:"exchange"`
 	Pair     string       `json:"pair"`
 	Channel  string       `json:"channel"`
 	Snapshot bool         `json:"snapshot"`
 	Sequence int64        `json:"sequence"`
-	Content  PriceContent `json:"content"`
+	Content  []TradesItem `json:"content"`
 }
+
+type TradesItem struct {
+	Id        string  `json:"id"`
+	Price     string  `json:"price"`
+	Quantity  string  `json:"quantity"`
+	Time      string  `json:"time"`
+	BTCValue  float64 `json:"btcValue"`
+	USDValue  float64 `json:"usdValue"`
+	TakerSide string  `json:"takerSide"`
+}
+
+////////////////////////////////////////
+
+type Orders struct {
+	Channel string   `json:"channel"`
+	Content []string `json:"content"`
+}
+
+///////////////////////////////////////
 
 type Subscription struct {
 	Type     string `json:"type"`

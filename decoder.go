@@ -16,7 +16,7 @@ func decode(b []byte) (interface{}, bool) {
 	if data.Type != "" {
 		if data.Type == "ping" {
 			isPing = true
-			return pingPong{Type: "pong", Data: data.Data}, isPing
+			return &pingPong{Type: "pong", Data: data.Data}, isPing
 		} else if data.Type == "error" {
 			return fmt.Errorf("server error: code: %d, type: %s, message: %s",
 				data.Code, data.Type, data.Message), isPing
@@ -27,13 +27,29 @@ func decode(b []byte) (interface{}, bool) {
 
 	switch data.Channel {
 	case "bbo", "orderbook":
-		var priceData PriceData
-		err = json.Unmarshal(b, &priceData)
+		var orderBook OrderBook
+		err = json.Unmarshal(b, &orderBook)
 		if err != nil {
-			return fmt.Errorf("parser failed to decode data: expected to have price data from channel: %s, err: %w",
+			return fmt.Errorf("parser failed to decode data: expected to have orderbook/bbo data from channel: %s, err: %w",
 				data.Channel, err), isPing
 		}
-		return priceData, isPing
+		return &orderBook, isPing
+	case "trade":
+		var trades Trades
+		err = json.Unmarshal(b, &trades)
+		if err != nil {
+			return fmt.Errorf("parser failed to decode data: expected to have trades data from channel: %s, err: %w",
+				data.Channel, err), isPing
+		}
+		return &trades, isPing
+	case "orders":
+		var orders Orders
+		err = json.Unmarshal(b, &orders)
+		if err != nil {
+			return fmt.Errorf("parser failed to decode data: expected to have orders data from channel: %s, err: %w",
+				data.Channel, err), isPing
+		}
+		return &orders, isPing
 	}
 
 	return fmt.Errorf("parser: unknown data type: channel: %s, data: %v", data.Channel, string(b)), isPing

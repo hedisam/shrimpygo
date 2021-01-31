@@ -6,6 +6,13 @@ import (
 	"github.com/hedisam/shrimpygo/internal/ws"
 )
 
+const (
+	ChanBBO       = "bbo"
+	ChanOrderBook = "orderbook"
+	ChanTrades    = "trades"
+	ChanOrders    = "orders"
+)
+
 type Shrimpy struct {
 	config *shrimpyConfig
 }

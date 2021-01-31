@@ -27,21 +27,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ws.Subscribe("orderbook", "coinbasepro", "btc-usd")
+	ws.Subscribe(shrimpygo.ChanBBO, "coinbasepro", "btc-usd")
 
 	for msg := range ws.Stream() {
+		fmt.Println("=========================================")
 		switch message := msg.(type) {
-		case shrimpygo.PriceData:
-			if message.Snapshot {
+		case *shrimpygo.OrderBook:
+			if message.Snapshot { // snapshot contains a lot of data, fills the entire screen.
 				continue
 			}
-			fmt.Println("=========================================")
+			fmt.Println(message)
+		case *shrimpygo.Trades:
 			fmt.Println(message)
 		case error:
 			log.Println("error from shrimpy: ", message)
 			return
 		default:
-			log.Println("unknown data type")
+			fmt.Println("unwanted data returned by the stream:", message)
 		}
 	}
 }
