@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Decoder is used to decode http response bodies.
 type Decoder func(reader io.Reader) error
 
 func httpGet(ctx context.Context, path string, cfg Config, decoder Decoder) ([]byte, error) {

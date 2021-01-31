@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+// Token returns a server-side token which is needed to setup websocket connections to the server.
 func Token(ctx context.Context, cfg Config) (string, error) {
 	var token struct{ Token string }
 	var decoder = func(reader io.Reader) error {

@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	ChanBBO       = "bbo"
-	ChanOrderBook = "orderbook"
-	ChanTrades    = "trades"
-	ChanOrders    = "orders"
+	ChannelBBO       = "bbo"
+	ChannelOrderBook = "orderbook"
+	ChannelTrades    = "trade"
+	ChannelOrders    = "orders"
 )
 
 type Shrimpy struct {

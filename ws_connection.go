@@ -12,25 +12,25 @@ type WSConnection struct {
 }
 
 // Subscribe to a channel on this ws connection.
-func (ws *WSConnection) Subscribe(channel, exchange, pair string) {
-	ws.stream.Send(Subscription{
-		Type:     "subscribe",
-		Exchange: exchange,
-		Pair:     pair,
-		Channel:  channel,
-	})
+func (ws *WSConnection) Subscribe(subscriptions ...Subscription) {
+	for _, subs := range subscriptions {
+		s := subs
+		s.Type = "subscribe"
+		ws.stream.Send(s)
+	}
 }
 
 // Unsubscribe from a channel on this ws connection.
-func (ws *WSConnection) Unsubscribe(channel, exchange, pair string) {
-	ws.stream.Send(Subscription{
-		Type:     "unsubscribe",
-		Exchange: exchange,
-		Pair:     pair,
-		Channel:  channel,
-	})
+func (ws *WSConnection) Unsubscribe(unSubscriptions ...Subscription) {
+	for _, unSub := range unSubscriptions {
+		u := unSub
+		u.Type = "unsubscribe"
+		ws.stream.Send(u)
+	}
 }
 
+// Stream returns a read-only channel which can be used to read websocket messages along with all kind of errors that
+// could happen while reading from or creating the ws connection.
 func (ws *WSConnection) Stream() <-chan interface{} {
 	out := make(chan interface{})
 	go func() {

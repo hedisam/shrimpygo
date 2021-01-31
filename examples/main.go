@@ -29,17 +29,26 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ws.Subscribe(shrimpygo.ChanBBO, "coinbasepro", "btc-usd")
+	ws.Subscribe(
+		shrimpygo.BBOSubs("coinbasepro", "btc-usd"),
+		shrimpygo.OrdersSubs(),
+		)
 
 	for msg := range ws.Stream() {
 		fmt.Println("=========================================")
 		switch message := msg.(type) {
-		case *shrimpygo.OrderBook:
+		case *shrimpygo.OrderBook: // it could be from channel bbo or orderbook
 			if message.Snapshot { // snapshot contains a lot of data, fills the entire screen.
 				continue
 			}
-			fmt.Println(message)
+			if message.Channel == shrimpygo.ChannelBBO {
+				fmt.Println("bbo:", message)
+				continue
+			}
+			fmt.Println("orderbook:", message)
 		case *shrimpygo.Trades:
+			fmt.Println(message)
+		case *shrimpygo.Orders:
 			fmt.Println(message)
 		case error:
 			log.Println("error from shrimpy: ", message)

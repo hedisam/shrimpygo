@@ -7,6 +7,7 @@ import (
 	"sync"
 )
 
+// Stream represents a websocket connection/stream which can be used to read from and write to the ws connection.
 type Stream struct {
 	conn *websocket.Conn
 	// the stream receives user messages and ping replies through upstreamChan. note that we never close this channel
@@ -49,6 +50,7 @@ func (s *Stream) start() {
 	s.dispose()
 }
 
+// Send a message to websocket server.
 func (s *Stream) Send(msg interface{}) {
 	go func() {
 		select {
@@ -58,10 +60,14 @@ func (s *Stream) Send(msg interface{}) {
 	}()
 }
 
+// DataChan returns a read-only channel used for reading from the ws connection. This channel will be closed in case of
+// reading any error from the websocket connection.
 func (s *Stream) DataChan() <-chan []byte {
 	return s.data
 }
 
+// ErrorsChan returns a read-only channel used for reading ws connection errors. If a websocket read/write error occurs,
+// it will be pushed to this channel and then the channel gets closed.
 func (s *Stream) ErrorsChan() <-chan error {
 	return s.errors
 }

@@ -26,7 +26,7 @@ func decode(b []byte) (interface{}, bool) {
 	}
 
 	switch data.Channel {
-	case "bbo", "orderbook":
+	case ChannelBBO, ChannelOrderBook:
 		var orderBook OrderBook
 		err = json.Unmarshal(b, &orderBook)
 		if err != nil {
@@ -34,7 +34,7 @@ func decode(b []byte) (interface{}, bool) {
 				data.Channel, err), isPing
 		}
 		return &orderBook, isPing
-	case "trade":
+	case ChannelTrades:
 		var trades Trades
 		err = json.Unmarshal(b, &trades)
 		if err != nil {
@@ -42,7 +42,7 @@ func decode(b []byte) (interface{}, bool) {
 				data.Channel, err), isPing
 		}
 		return &trades, isPing
-	case "orders":
+	case ChannelOrders:
 		var orders Orders
 		err = json.Unmarshal(b, &orders)
 		if err != nil {
