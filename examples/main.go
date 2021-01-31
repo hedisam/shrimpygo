@@ -24,7 +24,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ws, err := client.Websocket(ctx)
+	ws, err := client.Websocket(ctx, 10)
 	if err != nil {
 		log.Fatal(err)
 	}

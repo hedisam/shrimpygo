@@ -24,7 +24,8 @@ type Stream struct {
 }
 
 // CreateStream connects to the ws server and returns a Stream object containing the outbound channel.
-func CreateStream(ctx context.Context, config StreamConfig) (*Stream, error) {
+// downstream (data) channel's capacity is set by throughput.
+func CreateStream(ctx context.Context, throughput int, config StreamConfig) (*Stream, error) {
 	wsConn, err := setupWSConnection(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup a ws connection: %w", err)
@@ -34,9 +35,9 @@ func CreateStream(ctx context.Context, config StreamConfig) (*Stream, error) {
 		ctx:          ctx,
 		conn:         wsConn,
 		wg:           sync.WaitGroup{},
-		errors:       make(chan error),
-		data:         make(chan []byte),
-		upstreamChan: make(chan interface{}),
+		errors:       make(chan error, 1),
+		data:         make(chan []byte, throughput),
+		upstreamChan: make(chan interface{}, 1),
 	}
 
 	stream.start()

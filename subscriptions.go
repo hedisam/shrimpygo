@@ -1,5 +1,12 @@
 package shrimpygo
 
+const (
+	ChannelBBO       = "bbo"
+	ChannelOrderBook = "orderbook"
+	ChannelTrades    = "trade"
+	ChannelOrders    = "orders"
+)
+
 // BBOSubs returns a subscription of channel 'bbo'. Subscription's type will be set by Subscribe/Unsubscribe methods of
 // WSConnection instance.
 func BBOSubs(exchange, pair string) Subscription {

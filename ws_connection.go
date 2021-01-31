@@ -7,8 +7,9 @@ import (
 
 // WSConnection represents a shrimpy websocket connection
 type WSConnection struct {
-	stream *ws.Stream
-	ctx    context.Context
+	stream     *ws.Stream
+	ctx        context.Context
+	throughput int
 }
 
 // Subscribe to a channel on this ws connection.
@@ -32,7 +33,7 @@ func (ws *WSConnection) Unsubscribe(unSubscriptions ...Subscription) {
 // Stream returns a read-only channel which can be used to read websocket messages along with all kind of errors that
 // could happen while reading from or creating the ws connection.
 func (ws *WSConnection) Stream() <-chan interface{} {
-	out := make(chan interface{})
+	out := make(chan interface{}, ws.throughput)
 	go func() {
 		defer close(out)
 
@@ -40,13 +41,15 @@ func (ws *WSConnection) Stream() <-chan interface{} {
 			select {
 			case <-ws.ctx.Done():
 				return
-			case err := <-ws.stream.ErrorsChan():
+			case err, ok := <-ws.stream.ErrorsChan():
+				if !ok {return}
 				select {
 				case <-ws.ctx.Done():
 					return
 				case out <- err:
 				}
-			case rawMsg := <-ws.stream.DataChan():
+			case rawMsg, ok := <-ws.stream.DataChan():
+				if !ok {return}
 				data, isPing := decode(rawMsg)
 				if isPing {
 					ws.stream.Send(data)
