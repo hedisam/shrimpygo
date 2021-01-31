@@ -1,7 +1,7 @@
 package shrimpygo
 
 type PriceQuote struct {
-	Price string `json:"Price"`
+	Price    string `json:"Price"`
 	Quantity string `json:"quantity"`
 }
 
@@ -11,29 +11,29 @@ type PriceContent struct {
 }
 
 type PriceData struct {
-	Exchange string `json:"exchange"`
-	Pair string `json:"pair"`
-	Channel string `json:"channel"`
-	Snapshot bool `json:"snapshot"`
-	Sequence int64 `json:"sequence"`
-	Content PriceContent `json:"content"`
+	Exchange string       `json:"exchange"`
+	Pair     string       `json:"pair"`
+	Channel  string       `json:"channel"`
+	Snapshot bool         `json:"snapshot"`
+	Sequence int64        `json:"sequence"`
+	Content  PriceContent `json:"content"`
 }
 
 type Subscription struct {
-	Type string `json:"type"`
+	Type     string `json:"type"`
 	Exchange string `json:"exchange"`
-	Pair string `json:"pair"`
-	Channel string `json:"channel"`
+	Pair     string `json:"pair"`
+	Channel  string `json:"channel"`
 }
 
 type pingPong struct {
 	Type string `json:"type"`
-	Data int64 `json:"data"`
+	Data int64  `json:"data"`
 }
 
 type Error struct {
-	Type string `json:"type"`
-	Code int64 `json:"code"`
+	Type    string `json:"type"`
+	Code    int64  `json:"code"`
 	Message string `json:"message"`
 }
 
@@ -45,10 +45,6 @@ type unknownData struct {
 	// ping messages come with a Data field
 	Data int64 `json:"data"`
 	// Code and Message are expected with an error message
-	Code int64 `json:"code"`
+	Code    int64  `json:"code"`
 	Message string `json:"message"`
-}
-
-type wsToken struct {
-	Token string `json:"token"`
 }

@@ -3,16 +3,7 @@ package shrimpygo
 import (
 	"context"
 	"fmt"
-)
-
-const (
-	baseUrl   = "https://dev-api.shrimpy.io"
-	wsBaseUrl = "wg://ws-feed.shrimpy.io"
-	tokenPath = "/v1/ws/token"
-
-	apiKeyHeader   = "DEV-SHRIMPY-API-KEY"
-	apiNonceHeader = "DEV-SHRIMPY-API-NONCE"
-	apiSigHeader   = "DEV-SHRIMPY-API-SIGNATURE"
+	"github.com/hedisam/shrimpygo/internal/ws"
 )
 
 type Shrimpy struct {
@@ -34,7 +25,7 @@ func NewShrimpyClient(apiKey, secretKey string) (*Shrimpy, error) {
 // Websocket creates a websocket connection and returns a shrimpy WSConnection to interact with.
 func (shrimpy *Shrimpy) Websocket(ctx context.Context) (*WSConnection, error) {
 	// connect to the ws server and create a ws stream
-	stream, err := createStream(ctx, shrimpy.config)
+	stream, err := ws.CreateStream(ctx, shrimpy.config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a websocket stream: %w", err)
 	}

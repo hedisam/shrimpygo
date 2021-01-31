@@ -1,4 +1,4 @@
-package shrimpygo
+package ws
 
 import (
 	"context"
@@ -7,29 +7,29 @@ import (
 	"sync"
 )
 
-type wsStream struct {
+type Stream struct {
 	conn *websocket.Conn
 	// the stream receives user messages and ping replies through upstreamChan. note that we never close this channel
 	// because the goroutine(s) writing to this channel is not its owner. eventually it get cleaned by the garbage collector.
 	upstreamChan chan interface{}
 	// server messages will be pushed to the data channel
-	data   chan []byte
+	data chan []byte
 	// error messages will be sent through the errors channel
 	errors chan error
 	// closing the errors chan needs synchronization since both downstream and upstream goroutines will write
 	// to the same error channel.
-	wg sync.WaitGroup
+	wg  sync.WaitGroup
 	ctx context.Context
 }
 
-// createStream connects to the ws server and returns a wsStream object containing the outbound channel.
-func createStream(ctx context.Context, config *shrimpyConfig) (*wsStream, error) {
+// CreateStream connects to the ws server and returns a Stream object containing the outbound channel.
+func CreateStream(ctx context.Context, config StreamConfig) (*Stream, error) {
 	wsConn, err := setupWSConnection(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup a ws connection: %w", err)
 	}
 
-	stream := &wsStream{
+	stream := &Stream{
 		ctx:          ctx,
 		conn:         wsConn,
 		wg:           sync.WaitGroup{},
@@ -43,13 +43,13 @@ func createStream(ctx context.Context, config *shrimpyConfig) (*wsStream, error)
 	return stream, nil
 }
 
-func (s *wsStream) start() {
+func (s *Stream) start() {
 	s.upstream()
 	s.downstream()
 	s.dispose()
 }
 
-func (s *wsStream) send(msg interface{}) {
+func (s *Stream) Send(msg interface{}) {
 	go func() {
 		select {
 		case <-s.ctx.Done():
@@ -58,16 +58,16 @@ func (s *wsStream) send(msg interface{}) {
 	}()
 }
 
-func (s *wsStream) dataChan() <-chan []byte {
+func (s *Stream) DataChan() <-chan []byte {
 	return s.data
 }
 
-func (s *wsStream) errorsChan() <-chan error {
+func (s *Stream) ErrorsChan() <-chan error {
 	return s.errors
 }
 
 // downstream listens for incoming messages and push them to the data channel.
-func (s *wsStream) downstream() {
+func (s *Stream) downstream() {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
@@ -76,7 +76,8 @@ func (s *wsStream) downstream() {
 		// reading the socket
 		for {
 			select {
-			case <-s.ctx.Done(): return
+			case <-s.ctx.Done():
+				return
 			default:
 			}
 			_, msg, err := s.conn.ReadMessage()
@@ -85,7 +86,8 @@ func (s *wsStream) downstream() {
 				return
 			}
 			select {
-			case <-s.ctx.Done(): return
+			case <-s.ctx.Done():
+				return
 			case s.data <- msg:
 			}
 		}
@@ -93,13 +95,14 @@ func (s *wsStream) downstream() {
 }
 
 // upstream listens for user (un)subscription messages, ping replies, etc; and sends them to the server.
-func (s *wsStream) upstream() {
+func (s *Stream) upstream() {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
 		for {
 			select {
-			case <-s.ctx.Done(): return
+			case <-s.ctx.Done():
+				return
 			case msg, ok := <-s.upstreamChan:
 				if !ok {
 					return
@@ -116,7 +119,7 @@ func (s *wsStream) upstream() {
 
 // dispose waits for upstream and downstream goroutines to get done then closes the shared errors channel and
 // the websocket connection (which could be closed already).
-func (s *wsStream) dispose() {
+func (s *Stream) dispose() {
 	go func() {
 		s.wg.Wait()
 		close(s.errors)
@@ -124,11 +127,9 @@ func (s *wsStream) dispose() {
 	}()
 }
 
-func (s *wsStream) sendError(err error) {
+func (s *Stream) sendError(err error) {
 	select {
 	case <-s.ctx.Done():
 	case s.errors <- err:
 	}
 }
-
-

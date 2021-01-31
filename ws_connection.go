@@ -2,17 +2,33 @@ package shrimpygo
 
 import (
 	"context"
+	"github.com/hedisam/shrimpygo/internal/ws"
 )
 
 // WSConnection represents a shrimpy websocket connection
 type WSConnection struct {
-	stream *wsStream
-	ctx context.Context
+	stream *ws.Stream
+	ctx    context.Context
 }
 
-// Send a message to the websocket server.
-func (ws *WSConnection) Send(message interface{}) {
-	ws.stream.send(message)
+// Subscribe to a channel on this ws connection.
+func (ws *WSConnection) Subscribe(channel, exchange, pair string) {
+	ws.stream.Send(Subscription{
+		Type:     "subscribe",
+		Exchange: exchange,
+		Pair:     pair,
+		Channel:  channel,
+	})
+}
+
+// Unsubscribe from a channel on this ws connection.
+func (ws *WSConnection) Unsubscribe(channel, exchange, pair string) {
+	ws.stream.Send(Subscription{
+		Type:     "unsubscribe",
+		Exchange: exchange,
+		Pair:     pair,
+		Channel:  channel,
+	})
 }
 
 func (ws *WSConnection) Stream() <-chan interface{} {
@@ -22,20 +38,23 @@ func (ws *WSConnection) Stream() <-chan interface{} {
 
 		for {
 			select {
-			case <-ws.ctx.Done(): return
-			case err := <-ws.stream.errorsChan():
+			case <-ws.ctx.Done():
+				return
+			case err := <-ws.stream.ErrorsChan():
 				select {
-				case <-ws.ctx.Done(): return
+				case <-ws.ctx.Done():
+					return
 				case out <- err:
 				}
-			case rawMsg := <-ws.stream.dataChan():
+			case rawMsg := <-ws.stream.DataChan():
 				data, isPing := decode(rawMsg)
 				if isPing {
-					ws.Send(data)
+					ws.stream.Send(data)
 					continue
 				}
 				select {
-				case <-ws.ctx.Done(): return
+				case <-ws.ctx.Done():
+					return
 				case out <- data:
 				}
 			}

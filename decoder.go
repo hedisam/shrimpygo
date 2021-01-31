@@ -36,5 +36,5 @@ func decode(b []byte) (interface{}, bool) {
 		return priceData, isPing
 	}
 
-	return fmt.Errorf("parser: unknown data type: channel: %s, data: %v", data.Channel, data), isPing
+	return fmt.Errorf("parser: unknown data type: channel: %s, data: %v", data.Channel, string(b)), isPing
 }

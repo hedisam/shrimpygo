@@ -1,4 +1,4 @@
-package shrimpygo
+package rest
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func Get(ctx context.Context, path string, cfg *shrimpyConfig) ([]byte, error) {
+func get(ctx context.Context, path string, cfg Config) ([]byte, error) {
 	signature, nonce, err := createSignature(cfg.SecretKey(), path, http.MethodGet, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create api signature: %w", err)

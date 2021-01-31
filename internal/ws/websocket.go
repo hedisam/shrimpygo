@@ -1,14 +1,15 @@
-package shrimpygo
+package ws
 
 import (
 	"context"
 	"fmt"
 	"github.com/gorilla/websocket"
+	"github.com/hedisam/shrimpygo/internal/rest"
 )
 
-func setupWSConnection(ctx context.Context, config *shrimpyConfig) (*websocket.Conn, error) {
+func setupWSConnection(ctx context.Context, config StreamConfig) (*websocket.Conn, error) {
 	// the ws server requires a valid token
-	token, err := getToken(ctx, config)
+	token, err := rest.Token(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get a websocket token: %w", err)
 	}

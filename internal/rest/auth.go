@@ -1,4 +1,4 @@
-package shrimpygo
+package rest
 
 import (
 	"context"
@@ -10,13 +10,13 @@ import (
 	"time"
 )
 
-func getToken(ctx context.Context, cfg *shrimpyConfig) (string, error) {
-	resp, err := Get(ctx, tokenPath, cfg)
+func Token(ctx context.Context, cfg Config) (string, error) {
+	resp, err := get(ctx, tokenPath, cfg)
 	if err != nil {
 		return "", fmt.Errorf("token request failed: %w", err)
 	}
 
-	var token wsToken
+	var token struct{ Token string }
 	err = json.Unmarshal(resp, &token)
 	if err != nil {
 		return "", fmt.Errorf("couln't decode the token: %w", err)
