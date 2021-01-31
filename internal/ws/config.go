@@ -1,6 +1,6 @@
 package ws
 
 type StreamConfig interface {
-	APIKey() string
-	SecretKey() string
+	PublicApiKey() string
+	PrivateApiKey() string
 }

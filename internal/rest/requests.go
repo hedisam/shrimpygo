@@ -11,7 +11,7 @@ import (
 type Decoder func(reader io.Reader) error
 
 func httpGet(ctx context.Context, path string, cfg Config, decoder Decoder) ([]byte, error) {
-	signature, nonce, err := createSignature(cfg.SecretKey(), path, http.MethodGet, nil)
+	signature, nonce, err := createSignature(cfg.PrivateApiKey(), path, http.MethodGet, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create api signature: %w", err)
 	}
@@ -22,7 +22,7 @@ func httpGet(ctx context.Context, path string, cfg Config, decoder Decoder) ([]b
 	}
 
 	// signing the request
-	req.Header.Add(apiKeyHeader, cfg.APIKey())
+	req.Header.Add(apiKeyHeader, cfg.PublicApiKey())
 	req.Header.Add(apiNonceHeader, fmt.Sprint(nonce))
 	req.Header.Add(apiSigHeader, signature)
 

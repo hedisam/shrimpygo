@@ -1,14 +1,17 @@
 package shrimpygo
 
-type shrimpyConfig struct {
-	apiKey string
-	secretKey string
+// Config holds api keys. You can find your API keys from shrimpy developers dashboard.
+type Config struct {
+	// Public Key
+	PublicKey string
+	// Private Key
+	PrivateKey string
 }
 
-func (cfg *shrimpyConfig) APIKey() string {
-	return cfg.apiKey
+func (cfg *Config) PublicApiKey() string {
+	return cfg.PublicKey
 }
 
-func (cfg *shrimpyConfig) SecretKey() string {
-	return cfg.secretKey
+func (cfg *Config) PrivateApiKey() string {
+	return cfg.PrivateKey
 }

@@ -14,19 +14,15 @@ const (
 )
 
 type Shrimpy struct {
-	config *shrimpyConfig
+	config *Config
 }
 
-func NewShrimpyClient(apiKey, secretKey string) (*Shrimpy, error) {
-	if apiKey == "" || secretKey == "" {
-		return nil, fmt.Errorf("shrimpy: invalid api/secret key")
+func NewShrimpyClient(cfx Config) (*Shrimpy, error) {
+	if cfx.PublicApiKey() == "" || cfx.PrivateApiKey() == "" {
+		return nil, fmt.Errorf("shrimpy config: invalid api/secret key")
 	}
 
-	shConfig := &shrimpyConfig{
-		apiKey:    apiKey,
-		secretKey: secretKey,
-	}
-	return &Shrimpy{config: shConfig}, nil
+	return &Shrimpy{config: &cfx}, nil
 }
 
 // Websocket creates a websocket connection and returns a shrimpy WSConnection to interact with.

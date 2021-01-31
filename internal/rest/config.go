@@ -1,6 +1,6 @@
 package rest
 
 type Config interface {
-	APIKey() string
-	SecretKey() string
+	PublicApiKey() string
+	PrivateApiKey() string
 }

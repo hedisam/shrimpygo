@@ -14,7 +14,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client, err := shrimpygo.NewShrimpyClient(cfg.APIKey, cfg.SecretKey)
+	shrimpyCfg := shrimpygo.Config{PublicKey: cfg.APIKey, PrivateKey: cfg.SecretKey}
+
+	client, err := shrimpygo.NewShrimpyClient(shrimpyCfg)
 	if err != nil {
 		log.Fatal(err)
 	}
