@@ -39,7 +39,7 @@ type Error struct {
 
 type unknownData struct {
 	// having an Channel field shows it's not a ping nor an error. then we can decode the data based on the channel.
-	Channel string `json:"exchange"`
+	Channel string `json:"channel"`
 	// both error and ping messages come with a Type field
 	Type string `json:"type"`
 	// ping messages come with a Data field
