@@ -7,19 +7,23 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 )
 
 func Token(ctx context.Context, cfg Config) (string, error) {
-	resp, err := get(ctx, tokenPath, cfg)
-	if err != nil {
-		return "", fmt.Errorf("token request failed: %w", err)
+	var token struct{ Token string }
+	var decoder = func(reader io.Reader) error {
+		err := json.NewDecoder(reader).Decode(&token)
+		if err != nil {
+			return fmt.Errorf("failed to decode token: %w", err)
+		}
+		return nil
 	}
 
-	var token struct{ Token string }
-	err = json.Unmarshal(resp, &token)
+	_, err := httpGet(ctx, tokenPath, cfg, decoder)
 	if err != nil {
-		return "", fmt.Errorf("couln't decode the token: %w", err)
+		return "", fmt.Errorf("token request failed: %w", err)
 	}
 
 	return token.Token, err
