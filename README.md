@@ -39,7 +39,7 @@ func main() {
     PublicKey:  "my API key",
     PrivateKey: "my secret key",
   }
-  client, err := shrimpygo.NewShrimpyClient(cfg)
+  client, err := shrimpygo.NewClient(cfg)
   if err != nil {
     log.Fatal(err)
   }

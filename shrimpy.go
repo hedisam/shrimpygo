@@ -6,16 +6,16 @@ import (
 	"github.com/hedisam/shrimpygo/internal/ws"
 )
 
-type Shrimpy struct {
+type Client struct {
 	config *Config
 }
 
-func NewShrimpyClient(cfx Config) (*Shrimpy, error) {
+func NewClient(cfx Config) (*Client, error) {
 	if cfx.PublicApiKey() == "" || cfx.PrivateApiKey() == "" {
 		return nil, fmt.Errorf("shrimpy config: invalid api/secret key")
 	}
 
-	return &Shrimpy{config: &cfx}, nil
+	return &Client{config: &cfx}, nil
 }
 
 // Websocket creates a websocket connection and returns a shrimpy WSConnection to interact with.
@@ -23,7 +23,7 @@ func NewShrimpyClient(cfx Config) (*Shrimpy, error) {
 // since the websocket connection replaces unread messages whenever new data comes in, it's important to set an
 // appropriate value as throughput to not miss any data. This is more important when you're subscribed to multiple
 // channels of sequential data like order-book, especially in the times that market players are hyperactive.
-func (shrimpy *Shrimpy) Websocket(ctx context.Context, throughput int) (*WSConnection, error) {
+func (shrimpy *Client) Websocket(ctx context.Context, throughput int) (*WSConnection, error) {
 	// connect to the ws server and create a ws stream
 	stream, err := ws.CreateStream(ctx, throughput, shrimpy.config)
 	if err != nil {
