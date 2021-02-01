@@ -19,9 +19,10 @@ func NewShrimpyClient(cfx Config) (*Shrimpy, error) {
 }
 
 // Websocket creates a websocket connection and returns a shrimpy WSConnection to interact with.
-// throughput is just the downstream channel's capacity. the websocket connection replaces unread messages whenever
-// new data comes in, so it's important to set an appropriate value to the throughput to not miss any data and this is
-// more important when you're subscribed to (multiple) series of sequential data like orderbook.
+// throughput is just the downstream channel's capacity. Although in normal circumstances a small throughput works but
+// since the websocket connection replaces unread messages whenever new data comes in, it's important to set an
+// appropriate value as throughput to not miss any data. This is more important when you're subscribed to multiple
+// channels of sequential data like order-book, especially in the times that market players are hyperactive.
 func (shrimpy *Shrimpy) Websocket(ctx context.Context, throughput int) (*WSConnection, error) {
 	// connect to the ws server and create a ws stream
 	stream, err := ws.CreateStream(ctx, throughput, shrimpy.config)
