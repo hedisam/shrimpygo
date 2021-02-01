@@ -2,7 +2,7 @@
 Golang Shrimpy client
 
 ### What is Shrimpy?
-[Shrimpy](https://developers.shrimpy.io) provides real-time & historical crypto data
+[Shrimpy](https://developers.shrimpy.io) provides real-time & historical (and more) crypto data
 
 ### Coverage
 Right now only the websocket subscription has been implemented.
