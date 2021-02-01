@@ -14,7 +14,7 @@ Right now only the websocket subscription has been implemented.
     
 ### Todo
 * unit tests
-* rest api
+* implementing the remaining rest api
 * ...
 
 ### Install
