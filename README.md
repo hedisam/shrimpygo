@@ -1,5 +1,6 @@
 # shrimpygo
 Golang Shrimpy client
+
 It's still under development, so things might change.
 
 ### What is Shrimpy?
