@@ -10,7 +10,7 @@ func decode(b []byte) (interface{}, bool) {
 	var data unknownData
 	err := json.Unmarshal(b, &data)
 	if err != nil {
-		return fmt.Errorf("parser failed to decode data: %w", err), isPing
+		return fmt.Errorf("failed to decode json data: %w", err), isPing
 	}
 
 	if data.Type != "" {
@@ -21,7 +21,7 @@ func decode(b []byte) (interface{}, bool) {
 			return fmt.Errorf("server error: code: %d, type: %s, message: %s",
 				data.Code, data.Type, data.Message), isPing
 		} else {
-			return fmt.Errorf("parser: unknown data type: %v", data), isPing
+			return fmt.Errorf("decode: unknown data type: %v", data), isPing
 		}
 	}
 
@@ -30,7 +30,7 @@ func decode(b []byte) (interface{}, bool) {
 		var orderBook OrderBook
 		err = json.Unmarshal(b, &orderBook)
 		if err != nil {
-			return fmt.Errorf("parser failed to decode data: expected to have orderbook/bbo data from channel: %s, err: %w",
+			return fmt.Errorf("decode failed to decode data: expected to have orderbook/bbo data from channel: %s, err: %w",
 				data.Channel, err), isPing
 		}
 		return &orderBook, isPing
@@ -38,7 +38,7 @@ func decode(b []byte) (interface{}, bool) {
 		var trades Trades
 		err = json.Unmarshal(b, &trades)
 		if err != nil {
-			return fmt.Errorf("parser failed to decode data: expected to have trades data from channel: %s, err: %w",
+			return fmt.Errorf("decode failed to decode data: expected to have trades data from channel: %s, err: %w",
 				data.Channel, err), isPing
 		}
 		return &trades, isPing
@@ -46,11 +46,11 @@ func decode(b []byte) (interface{}, bool) {
 		var orders Orders
 		err = json.Unmarshal(b, &orders)
 		if err != nil {
-			return fmt.Errorf("parser failed to decode data: expected to have orders data from channel: %s, err: %w",
+			return fmt.Errorf("decode failed to decode data: expected to have orders data from channel: %s, err: %w",
 				data.Channel, err), isPing
 		}
 		return &orders, isPing
 	}
 
-	return fmt.Errorf("parser: unknown data type: channel: %s, data: %v", data.Channel, string(b)), isPing
+	return fmt.Errorf("decode: unknown data type: channel: %s, data: %v", data.Channel, string(b)), isPing
 }

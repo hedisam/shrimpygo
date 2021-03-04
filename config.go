@@ -1,6 +1,6 @@
 package shrimpygo
 
-// Config holds api keys. You can find your API keys from shrimpy developers dashboard.
+// Config holds api keys. You can find your API keys on shrimpy developers dashboard.
 type Config struct {
 	// Public Key. The API key.
 	PublicKey string
