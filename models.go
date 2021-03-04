@@ -7,6 +7,13 @@ type ExchangeInfo struct {
 	IconUrl string `json:"icon"`
 }
 
+type ExchangeAsset struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Symbol string `json:"symbol"`
+	TradingSymbol string `json:"tradingSymbol"`
+}
+
 /////////////////////////////////////////
 
 type OrderBook struct {

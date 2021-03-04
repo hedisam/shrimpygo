@@ -39,17 +39,39 @@ func (cli *Client) Websocket(ctx context.Context, throughput int) (*WSConnection
 // may be applied, check the docs @ https://developers.shrimpy.io/docs/#public)
 func (cli *Client) SupportedExchanges(ctx context.Context, freeApiCall bool) ([]ExchangeInfo, error) {
 	var exchanges []ExchangeInfo
-	var err error
+	var cfg rest.Config = cli.config
 
 	if freeApiCall {
-		err = rest.HttpGet(ctx, supportedExchanges, nil, rest.NewDecoderFunc(&exchanges))
-	} else {
-		err = rest.HttpGet(ctx, supportedExchanges, cli.config, rest.NewDecoderFunc(&exchanges))
+		cfg = nil
 	}
 
+	err := rest.HttpGet(ctx, supportedExchanges, cfg, rest.NewDecoderFunc(&exchanges))
 	if err != nil {
 		return nil, fmt.Errorf("shrimpygo failed to retrieve the supported exchanges list: %w", err)
 	}
 
 	return exchanges, nil
+}
+
+// ExchangeAssets retrieves exchange asset information for a particular exchange.
+// no API keys are attached to the http request if you set freeApiCall which makes it a cost free request (rate limiting
+// may be applied, check the docs @ https://developers.shrimpy.io/docs/#public)
+// Note that Shrimpy hosts a logo for each asset according to the table below:
+// 32x32 	-> https://assets.shrimpy.io/cryptoicons/png/<id>.png
+// 128x128 	-> https://assets.shrimpy.io/cryptoicons/png128/<id>.png
+func (cli *Client) ExchangeAssets(ctx context.Context, exchange string, freeApiCall bool) ([]ExchangeAsset, error) {
+	var assets []ExchangeAsset
+	var urlPath = fmt.Sprintf(exchangeAssets, exchange)
+	var cfg rest.Config = cli.config
+
+	if freeApiCall {
+		cfg = nil
+	}
+
+	err := rest.HttpGet(ctx, urlPath, cfg, rest.NewDecoderFunc(&assets))
+	if err != nil {
+		return nil, fmt.Errorf("shrimpygo failed to retrieve exchange assets list: %w", err)
+	}
+
+	return assets, nil
 }

@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/hedisam/shrimpygo"
 	"log"
 )
 
-func SupportedExchanges(freeApiCall bool) {
-	cli := NewClient()
-	exchanges, err := cli.SupportedExchanges(context.Background(), freeApiCall)
+func SupportedExchanges(client *shrimpygo.Client,freeApiCall bool) {
+	exchanges, err := client.SupportedExchanges(context.Background(), freeApiCall)
 	if err != nil {
 		log.Fatal(err)
 	}

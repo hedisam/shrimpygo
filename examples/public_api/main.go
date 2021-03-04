@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	SupportedExchanges(true)
+	SupportedExchanges(NewClient(), false)
 }
 
 func NewClient() *shrimpygo.Client {
