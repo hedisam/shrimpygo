@@ -1,5 +1,14 @@
 package shrimpygo
 
+type ExchangeInfo struct {
+	Exchange string `json:"exchange"`
+	BestCaseFee float64 `json:"bestCaseFee"`
+	WorstCaseFee float64 `json:"worstCaseFee"`
+	IconUrl string `json:"icon"`
+}
+
+/////////////////////////////////////////
+
 type OrderBook struct {
 	Exchange string           `json:"exchange"`
 	Pair     string           `json:"pair"`

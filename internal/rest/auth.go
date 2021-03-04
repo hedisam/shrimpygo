@@ -5,24 +5,14 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"io"
 	"time"
 )
 
-// Token returns a server-side token which is needed to setup websocket connections to the server.
+// Token returns a server-side token which is needed to setup websocket connections.
 func Token(ctx context.Context, cfg Config) (string, error) {
 	var token struct{ Token string }
-	var decoder = func(reader io.Reader) error {
-		err := json.NewDecoder(reader).Decode(&token)
-		if err != nil {
-			return fmt.Errorf("failed to decode token: %w", err)
-		}
-		return nil
-	}
-
-	_, err := httpGet(ctx, tokenPath, cfg, decoder)
+	err := HttpGet(ctx, tokenPath, cfg, NewDecoderFunc(&token))
 	if err != nil {
 		return "", fmt.Errorf("token request failed: %w", err)
 	}

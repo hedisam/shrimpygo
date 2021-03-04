@@ -52,6 +52,7 @@ func (ws *WSConnection) Stream() <-chan interface{} {
 				if !ok {return}
 				data, isPing := decode(rawMsg)
 				if isPing {
+					// the ping message has been converted to a pong message (data) by the decode function
 					ws.stream.Send(data)
 					continue
 				}

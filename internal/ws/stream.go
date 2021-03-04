@@ -11,7 +11,7 @@ import (
 type Stream struct {
 	conn *websocket.Conn
 	// the stream receives user messages and ping replies through upstreamChan. note that we never close this channel
-	// because the goroutine(s) writing to this channel is not its owner. eventually it get cleaned by the garbage collector.
+	// because the goroutine(s) writing to this channel is not its owner. eventually it gets cleaned by the garbage collector.
 	upstreamChan chan interface{}
 	// server messages will be pushed to the data channel
 	data chan []byte
@@ -51,7 +51,7 @@ func (s *Stream) start() {
 	s.dispose()
 }
 
-// Send a message to websocket server.
+// Send a message to the websocket server.
 func (s *Stream) Send(msg interface{}) {
 	go func() {
 		select {
@@ -101,7 +101,7 @@ func (s *Stream) downstream() {
 	}()
 }
 
-// upstream listens for user (un)subscription messages, ping replies, etc; and sends them to the server.
+// upstream listens for user's (un)subscription messages, ping replies, etc; and sends them to the server.
 func (s *Stream) upstream() {
 	s.wg.Add(1)
 	go func() {
