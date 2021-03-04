@@ -14,6 +14,11 @@ type ExchangeAsset struct {
 	TradingSymbol string `json:"tradingSymbol"`
 }
 
+type TradingPair struct {
+	BaseSymbol string `json:"baseTradingSymbol"`
+	QuoteSymbol string `json:"quoteTradingSymbol"`
+}
+
 /////////////////////////////////////////
 
 type OrderBook struct {
