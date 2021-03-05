@@ -72,7 +72,7 @@ func main() {
   for iData := range ws.Stream() {
     fmt.Println("============================")
     switch data := iData.(type) {
-    case *shrimpygo.OrderBook:
+    case *shrimpygo.OrderBookInfo:
       fmt.Printf("OrderBook: %v\n", data)
     case error:
       fmt.Printf("shrimpy error: %+v\n", data)
