@@ -54,7 +54,7 @@ func main() {
 	for msg := range ws.Stream() {
 		fmt.Println("=========================================")
 		switch message := msg.(type) {
-		case *shrimpygo.OrderBook: // it could be from bbo or order-book channel
+		case *shrimpygo.OrderBookInfo: // it could be from bbo or order-book channel
 			if message.Snapshot {
 				// too much data to be printed.
 				continue

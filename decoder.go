@@ -27,7 +27,7 @@ func decode(b []byte) (interface{}, bool) {
 
 	switch data.Channel {
 	case ChannelBBO, ChannelOrderBook:
-		var orderBook OrderBook
+		var orderBook OrderBookInfo
 		err = json.Unmarshal(b, &orderBook)
 		if err != nil {
 			return fmt.Errorf("decode failed to decode data: expected to have orderbook/bbo data from channel: %s, err: %w",

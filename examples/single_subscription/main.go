@@ -47,7 +47,7 @@ func main() {
 	for iData := range ws.Stream() {
 		fmt.Println("============================")
 		switch data := iData.(type) {
-		case *shrimpygo.OrderBook:
+		case *shrimpygo.OrderBookInfo:
 			if data.Snapshot {
 				// too much data to be printed.
 				continue

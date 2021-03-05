@@ -3,6 +3,7 @@ package shrimpygo
 import (
 	"context"
 	"fmt"
+	"github.com/hedisam/shrimpygo/internal/rest"
 	"github.com/hedisam/shrimpygo/internal/ws"
 )
 
@@ -58,3 +59,72 @@ func (cli *Client) TradingPairs(ctx context.Context, exchange string, freeApiCal
 	return tradingPairs(cli, ctx, exchange, freeApiCall)
 }
 
+// GetTicker retrieves all Shrimpy supported exchange assets for a particular exchange along with pricing information.
+// Note: The symbol for the same asset may vary based on the exchange. For example, Stellar is "STR" on Poloniex,
+// but "XLM" on other exchanges.
+func (cli *Client) GetTicker(ctx context.Context, exchange string) ([]Ticker, error) {
+	var tickers []Ticker
+
+	err := rest.HttpGet(ctx, fmt.Sprintf(getTickerApi, exchange), cli.config, rest.NewDecoderFunc(&tickers))
+	if err != nil {
+		return nil, fmt.Errorf("shrimpygo failed to retrieve tickers list: %w", err)
+	}
+
+	return tickers, nil
+}
+
+// GetOrderBooks retrieves live order book data. Examples of data that can be retrieved in a single call are below:
+// * full depth order book for a single currency pair
+// * order book for all currency pairs on a single exchange
+// * order books for currency pairs across multiple exchanges
+// See the MarketOrderBooks type for more information.
+// exchanges:
+//		The exchange for which to retrieve live order book data(e.g. coinbasepro);
+// 		OR A comma separated list of exchanges (e.g. "bittrex,binance")
+//		OR "all" to retrieve data for all supported exchanges
+// queryOptions:
+//		It could be a combining of these three: baseSymbol, quoteSymbol, or limit. They're all optional.
+//		You can use the helper function QueryParams to build your query parameters. (see the exmaples)
+// 		baseSymbol:
+//			The base symbol. (e.g. XLM for a XLM-BTC market) quantity is in these units.
+//			OR A comma separated list of baseSymbols (e.g. "XLM,STR,ETH")
+//			Note: if baseSymbol is not supplied, all markets matching the quoteSymbol will be returned.
+//		quoteSymbol:
+// 			The quote symbol. (e.g. BTC for a XLM-BTC market)
+//			OR A comma separated list of quoteSymbols (e.g. "BTC,USDT")
+//			Note: if quoteSymbol is not supplied, all markets matching the baseSymbol will be returned.
+//		limit:
+//			The maximum number of asks and bids to retrieve. Defaults to 10 if not supplied.
+//			Note: if requesting more than one market, limit cannot be greater than 10.
+func (cli *Client) GetOrderBooks(ctx context.Context, exchanges string, queryOptions ...string) ([]MarketOrderBooks, error) {
+	var orderBooks []MarketOrderBooks
+
+	path := fmt.Sprint(getOrderBooksApi, "?exchange=", exchanges)
+	for _, option := range queryOptions {
+		path = fmt.Sprint(path, "&", option)
+	}
+
+	err := rest.HttpGet(ctx, path, cli.config, rest.NewDecoderFunc(&orderBooks))
+	if err != nil {
+		return nil, fmt.Errorf("shrimpygo failed to retrieve market orderbooks list: %w", err)
+	}
+
+	return orderBooks, nil
+}
+
+const (
+	BaseSymbol = "baseSymbol"
+	QuoteSymbol = "quoteSymbol"
+	Limit 	= "limit"
+)
+
+func QueryParams(name string, params ...string) string {
+	query := name + "="
+	for i, param := range params {
+		query += param
+		if i < len(params) - 1 {
+			query += ","
+		}
+	}
+	return query
+}

@@ -21,7 +21,35 @@ type TradingPair struct {
 
 /////////////////////////////////////////
 
+type Ticker struct {
+	Name string `json:"name"`
+	Symbol string `json:"symbol"`
+	PriceUSD string `json:"priceUsd"`
+	PriceBTC string `json:"priceBtc"`
+	Last24hChange string `json:"percentChange24hUsd"`
+	LastUpdated string `json:"lastUpdated"`
+}
+
+type MarketOrderBooks struct {
+	BaseSymbol string `json:"baseSymbol"`
+	QuoteSymbol string `json:"quoteSymbol"`
+	OrderBooks []ExchangeOrderBook `json:"orderBooks"`
+}
+
+type ExchangeOrderBook struct {
+	Exchange string `json:"exchange"`
+	OrderBook OrderBook `json:"orderBook"`
+}
+
 type OrderBook struct {
+	Asks []OrderBookItem `json:"asks"`
+	Bids []OrderBookItem `json:"bids"`
+}
+
+/////////////////////////////////////////
+
+// OrderBookInfo returned by the websocket api
+type OrderBookInfo struct {
 	Exchange string           `json:"exchange"`
 	Pair     string           `json:"pair"`
 	Channel  string           `json:"channel"`
@@ -31,6 +59,7 @@ type OrderBook struct {
 }
 
 type OrderBookContent struct {
+	Sequence int64 `json:"sequence"`
 	Asks []OrderBookItem `json:"asks"`
 	Bids []OrderBookItem `json:"bids"`
 }
