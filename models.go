@@ -46,6 +46,18 @@ type OrderBook struct {
 	Bids []OrderBookItem `json:"bids"`
 }
 
+type CandleStick struct {
+	Open string `json:"open"`
+	High string `json:"high"`
+	Low string `json:"low"`
+	Close string `json:"close"`
+	Volume string `json:"volume"`
+	QuoteVolume float64 `json:"quoteVolume"`
+	BTCVolume float64 `json:"btcVolume"`
+	USDVolume float64 `json:"usdVolume"`
+	Time string `json:"time"`
+}
+
 /////////////////////////////////////////
 
 // OrderBookInfo returned by the websocket api

@@ -3,7 +3,6 @@ package shrimpygo
 import (
 	"context"
 	"fmt"
-	"github.com/hedisam/shrimpygo/internal/rest"
 	"github.com/hedisam/shrimpygo/internal/ws"
 )
 
@@ -63,14 +62,7 @@ func (cli *Client) TradingPairs(ctx context.Context, exchange string, freeApiCal
 // Note: The symbol for the same asset may vary based on the exchange. For example, Stellar is "STR" on Poloniex,
 // but "XLM" on other exchanges.
 func (cli *Client) GetTicker(ctx context.Context, exchange string) ([]Ticker, error) {
-	var tickers []Ticker
-
-	err := rest.HttpGet(ctx, fmt.Sprintf(getTickerApi, exchange), cli.config, rest.NewDecoderFunc(&tickers))
-	if err != nil {
-		return nil, fmt.Errorf("shrimpygo failed to retrieve tickers list: %w", err)
-	}
-
-	return tickers, nil
+	return getTicker(cli, ctx, exchange)
 }
 
 // GetOrderBooks retrieves live order book data. Examples of data that can be retrieved in a single call are below:
@@ -97,34 +89,28 @@ func (cli *Client) GetTicker(ctx context.Context, exchange string) ([]Ticker, er
 //			The maximum number of asks and bids to retrieve. Defaults to 10 if not supplied.
 //			Note: if requesting more than one market, limit cannot be greater than 10.
 func (cli *Client) GetOrderBooks(ctx context.Context, exchanges string, queryOptions ...string) ([]MarketOrderBooks, error) {
-	var orderBooks []MarketOrderBooks
-
-	path := fmt.Sprint(getOrderBooksApi, "?exchange=", exchanges)
-	for _, option := range queryOptions {
-		path = fmt.Sprint(path, "&", option)
-	}
-
-	err := rest.HttpGet(ctx, path, cli.config, rest.NewDecoderFunc(&orderBooks))
-	if err != nil {
-		return nil, fmt.Errorf("shrimpygo failed to retrieve market orderbooks list: %w", err)
-	}
-
-	return orderBooks, nil
+	return getOrderBooks(cli, ctx, exchanges, queryOptions...)
 }
 
-const (
-	BaseSymbol = "baseSymbol"
-	QuoteSymbol = "quoteSymbol"
-	Limit 	= "limit"
-)
+// GetCandles retrieves live candlestick data. The candlestick data is typically used to plot a candlestick or OHLCV chart.
+// When retrieving candlestick data for plotting, first call the endpoint without specifying a startTime. This will
+// return data associated with the most recent 1000 candlesticks. Subsequently, periodically call the endpoint
+// specifying the startTime as the time associated with the most recent candlestick. Note that the last or most recent
+// candlestick is for the current, not-yet-committed frame.
+// All times are in returned in UTC.
+// Note: if no trades occur within a particular time frame, no candlestick data will be created for that time frame.
+// interval -> one of these values: 1m, 5m, 15m, 1h, 6h, or 1d
+// startTime(optional) -> Optionally only return data on or after the supplied startTime (inclusive).
+func (cli *Client) GetCandles(ctx context.Context, exchange, baseSymbol, quoteSymbol, interval string,
+	startTime ...string) ([]CandleStick, error) {
 
-func QueryParams(name string, params ...string) string {
-	query := name + "="
-	for i, param := range params {
-		query += param
-		if i < len(params) - 1 {
-			query += ","
-		}
+	var st string
+	if len(startTime) == 1 {
+		st = startTime[0]
+	} else if len(startTime) > 1 {
+		return nil, fmt.Errorf("failed to get candles list: too many options provided for startTime: please " +
+			"provide max one option")
 	}
-	return query
+
+	return getCandles(cli, ctx, exchange, baseSymbol, quoteSymbol, interval, st)
 }

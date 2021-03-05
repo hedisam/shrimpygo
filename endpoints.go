@@ -9,4 +9,5 @@ const (
 	// market data api
 	getTickerApi = "/v1/exchanges/%s/ticker" // %s to be replaced by the exchange id
 	getOrderBooksApi = "/v1/orderbooks"
+    getCandlesApi = "/v1/exchanges/%s/candles" // %s to be replaced by the exchange id
 )

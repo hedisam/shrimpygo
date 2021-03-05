@@ -10,11 +10,21 @@ import (
 
 func main() {
 	client := NewClient()
-	RetrieveMultipleOrderBooks(client)
+	GetCandles(client)
+}
+
+func GetCandles(cli *shrimpygo.Client) {
+	candles, err := cli.GetCandles(context.Background(), "coinbasepro", "BTC", "USD",
+		"1m")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Candles: %v\n", candles)
 }
 
 func RetrieveMultipleOrderBooks(cli *shrimpygo.Client) {
-	orderBooks, err := cli.GetOrderBooks(context.Background(), "coinbasepro",
+	orderBooks, err := cli.GetOrderBooks(context.Background(), "coinbasepro,binance",
 		shrimpygo.QueryParams(shrimpygo.BaseSymbol, "BTC,ETH"),
 		shrimpygo.QueryParams("quoteSymbol", "USD"),
 		"limit=5", // or you could just type your query without utilizing the helper function
