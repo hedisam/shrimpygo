@@ -7,12 +7,15 @@ It's still under development, so things might change.
 [Shrimpy](https://developers.shrimpy.io) provides real-time & historical (and more) crypto data
 
 ### Coverage
-Right now only the websocket subscription has been implemented.
 * Websocket subscriptions
-    * BBO (Best Bid Offer) channel
-    * Order book channel
-    * Trades channel
-    * Orders channel
+  * BBO (Best Bid Offer) channel
+  * Order book channel
+  * Trades channel
+  * Orders channel
+* Rest API
+  * Public endpoints
+  * Market-Data endpoints
+  * Historical-Data endpoints
     
 ### Todo
 * unit tests
