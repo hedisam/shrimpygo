@@ -1,43 +1,43 @@
 package shrimpygo
 
 type ExchangeInfo struct {
-	Exchange string `json:"exchange"`
-	BestCaseFee float64 `json:"bestCaseFee"`
+	Exchange     string  `json:"exchange"`
+	BestCaseFee  float64 `json:"bestCaseFee"`
 	WorstCaseFee float64 `json:"worstCaseFee"`
-	IconUrl string `json:"icon"`
+	IconUrl      string  `json:"icon"`
 }
 
 type ExchangeAsset struct {
-	Id int `json:"id"`
-	Name string `json:"name"`
-	Symbol string `json:"symbol"`
+	Id            int    `json:"id"`
+	Name          string `json:"name"`
+	Symbol        string `json:"symbol"`
 	TradingSymbol string `json:"tradingSymbol"`
 }
 
 type TradingPair struct {
-	BaseSymbol string `json:"baseTradingSymbol"`
+	BaseSymbol  string `json:"baseTradingSymbol"`
 	QuoteSymbol string `json:"quoteTradingSymbol"`
 }
 
 /////////////////////////////////////////
 
 type Ticker struct {
-	Name string `json:"name"`
-	Symbol string `json:"symbol"`
-	PriceUSD string `json:"priceUsd"`
-	PriceBTC string `json:"priceBtc"`
+	Name          string `json:"name"`
+	Symbol        string `json:"symbol"`
+	PriceUSD      string `json:"priceUsd"`
+	PriceBTC      string `json:"priceBtc"`
 	Last24hChange string `json:"percentChange24hUsd"`
-	LastUpdated string `json:"lastUpdated"`
+	LastUpdated   string `json:"lastUpdated"`
 }
 
 type MarketOrderBooks struct {
-	BaseSymbol string `json:"baseSymbol"`
-	QuoteSymbol string `json:"quoteSymbol"`
-	OrderBooks []ExchangeOrderBook `json:"orderBooks"`
+	BaseSymbol  string              `json:"baseSymbol"`
+	QuoteSymbol string              `json:"quoteSymbol"`
+	OrderBooks  []ExchangeOrderBook `json:"orderBooks"`
 }
 
 type ExchangeOrderBook struct {
-	Exchange string `json:"exchange"`
+	Exchange  string    `json:"exchange"`
 	OrderBook OrderBook `json:"orderBook"`
 }
 
@@ -47,15 +47,65 @@ type OrderBook struct {
 }
 
 type CandleStick struct {
-	Open string `json:"open"`
-	High string `json:"high"`
-	Low string `json:"low"`
-	Close string `json:"close"`
-	Volume string `json:"volume"`
+	Open        string  `json:"open"`
+	High        string  `json:"high"`
+	Low         string  `json:"low"`
+	Close       string  `json:"close"`
+	Volume      string  `json:"volume"`
 	QuoteVolume float64 `json:"quoteVolume"`
-	BTCVolume float64 `json:"btcVolume"`
-	USDVolume float64 `json:"usdVolume"`
+	BTCVolume   float64 `json:"btcVolume"`
+	USDVolume   float64 `json:"usdVolume"`
+	Time        string  `json:"time"`
+}
+
+/////////////////////////////////////////
+
+type HistoricalCandlestick struct {
+	Open        string  `json:"open"`
+	High        string  `json:"high"`
+	Low         string  `json:"low"`
+	Close       string  `json:"close"`
+	Volume      string  `json:"volume"`
+	QuoteVolume float64 `json:"quoteVolume"`
+	BTCVolume   float64 `json:"btcVolume"`
+	USDVolume   float64 `json:"usdVolume"`
+	Time        string  `json:"time"`
+}
+
+type HistoricalInstrument struct {
+	Exchange    string `json:"exchange"`
+	BaseSymbol  string `json:"baseTradingSymbol"`
+	QuoteSymbol string `json:"quoteTradingSymbol"`
+	// The start time of first datapoint for this instrument
+	OrderBookStartTime string `json:"orderBookStartTime"`
+	// The end time of last datapoint for this instrument
+	OrderBookEndTime string `json:"orderBookEndTime"`
+	// The start time of first datapoint for this instrument
+	TradeStartTime string `json:"tradeStartTime"`
+	// The end time of last datapoint for this instrument
+	TradeEndTime string `json:"tradeEndTime"`
+}
+
+type HistoricalTrade struct {
+	Time  string `json:"time"`
+	Size  string `json:"size"`
+	Price string `json:"price"`
+	// Can be either 'buyer', 'seller' or 'unknown'.
+	TakerSide string `json:"takerSide"`
+}
+
+type HistoricalOrderBook struct {
+	// The id of the limit order !!! (from the docs: https://developers.shrimpy.io/docs/#historical-trade)
 	Time string `json:"time"`
+	// The best asks for the market. (ascending order)
+	Asks HistOrderBookItem `json:"asks"`
+	// The best bids for the market. (descending order)
+	Bids []HistOrderBookItem `json:"bids"`
+}
+
+type HistOrderBookItem struct {
+	Price string `json:"price"`
+	Size  string `json:"size"`
 }
 
 /////////////////////////////////////////
@@ -71,9 +121,9 @@ type OrderBookInfo struct {
 }
 
 type OrderBookContent struct {
-	Sequence int64 `json:"sequence"`
-	Asks []OrderBookItem `json:"asks"`
-	Bids []OrderBookItem `json:"bids"`
+	Sequence int64           `json:"sequence"`
+	Asks     []OrderBookItem `json:"asks"`
+	Bids     []OrderBookItem `json:"bids"`
 }
 
 type OrderBookItem struct {

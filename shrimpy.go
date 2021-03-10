@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/hedisam/shrimpygo/internal/ws"
+	"strings"
+	"time"
 )
 
 type Client struct {
@@ -99,18 +101,114 @@ func (cli *Client) GetOrderBooks(ctx context.Context, exchanges string, queryOpt
 // candlestick is for the current, not-yet-committed frame.
 // All times are in returned in UTC.
 // Note: if no trades occur within a particular time frame, no candlestick data will be created for that time frame.
-// interval -> one of these values: 1m, 5m, 15m, 1h, 6h, or 1d
-// startTime(optional) -> Optionally only return data on or after the supplied startTime (inclusive).
-func (cli *Client) GetCandles(ctx context.Context, exchange, baseSymbol, quoteSymbol, interval string,
+// pair: pair is the currency pair you're interested in, it could be either like "base/quote" or "base-quote" (e.g. BTC/USD)
+// interval: one of these values: 1m, 5m, 15m, 1h, 6h, or 1d
+// startTime(optional): Optionally only return data on or after the supplied startTime (inclusive).
+func (cli *Client) GetCandles(ctx context.Context, exchange, pair, interval string,
 	startTime ...string) ([]CandleStick, error) {
 
 	var st string
 	if len(startTime) == 1 {
 		st = startTime[0]
 	} else if len(startTime) > 1 {
-		return nil, fmt.Errorf("failed to get candles list: too many options provided for startTime: please " +
+		return nil, fmt.Errorf("shrimpygo failed to retrieve candlesticks list: too many options provided for startTime: please " +
 			"provide max one option")
 	}
 
-	return getCandles(cli, ctx, exchange, baseSymbol, quoteSymbol, interval, st)
+	base, quote, err := pairSeparator(pair)
+	if err != nil {
+		return nil, fmt.Errorf("shrimpygo failed to retrieve candlesticks list: %w", err)
+	}
+
+	return getCandles(cli, ctx, exchange, base, quote, interval, st)
+}
+
+// GetHistCandles retrieves historical candlestick (OHLCV) data based on the exchange, start and end times, and currency
+// pair passed in. Data is returned as lists of HistoricalCandlestick objects.
+// startTime and endTime need to be in ISO 8601 format.
+// pair: the currency pair you're interested in, it could be either like "base/quote" or "base-quote" (e.g. BTC/USD)
+// limit: the amount of items to return. Must be an integer from 1 to 1000.
+// interval: must be one of the following values: 1m, 5m, 15m, 1h, 6h, or 1d
+func (cli *Client) GetHistoricalCandles(ctx context.Context, exchange, pair string, interval string, limit int,
+	startTime, endTime time.Time) ([]HistoricalCandlestick, error) {
+	base, quote, err := pairSeparator(pair)
+	if err != nil {
+		return nil, fmt.Errorf("shrimpygo failed to retrieve historical candlesticks list: %w", err)
+	}
+	return getHistoricalCandles(cli, ctx, exchange, base, quote, interval, limit, startTime, endTime)
+}
+
+// GetHistoricalCount retrieves that number of data points available based on the type, exchange, start and end times,
+// and currency pair passed in. for dataType (type) of 'orderbook' the number of snapshots will be returned.
+// startTime and endTime time must be rounded to the nearest hour (i.e. minutes and seconds must be 0)
+// dataType: corresponds to the 'type' query parameter, either 'trade' or 'orderbook'.
+func (cli *Client) GetHistoricalCount(ctx context.Context, exchange, dataType, pair string,
+	startTime, endTime time.Time) (int, error) {
+	base, quote, err := pairSeparator(pair)
+	if err != nil {
+		return -1, fmt.Errorf("shrimpygo failed to retrieve historical count: %w", err)
+	}
+
+	return getHistoricalCount(cli, ctx, exchange, dataType, base, quote, startTime, endTime)
+}
+
+// GetHistoricalInstruments retrieves the supported historical instruments on the Developer API and their available
+// historical order book and trade data ranges.
+// queryOptions:
+//		It could be a combining of these three: baseTradingSymbol, quoteTradingSymbol, and/or exchange. They're all
+//		optional.
+//		You can use the helper function QueryParams to build your query parameters. (see the exmaples)
+// 		exchange:
+//			If provided, only trading pairs that are available on exchange will be returned
+//		baseTradingSymbol:
+//			If provided, only trading pairs with a matching base trading symbol will be returned
+//		quoteTradingSymbol:
+//			If provided, only trading pairs with a matching quote trading symbol will be returned
+func (cli *Client) GetHistoricalInstruments(ctx context.Context, queryOptions ...string) ([]HistoricalInstrument, error) {
+	return getHistoricalInstruments(cli, ctx, queryOptions...)
+}
+
+// GetHistoricalOrderBooks retrieves historical orderbooks based on the exchange, start and end times, and currency pair
+// passed in. Data is returned as lists of HistoricalOrderBook objects as demonstrated in the examples.
+// Historical Order Book Snapshots are taken roughly every minute.
+// pair: the currency pair you're interested in, it could be either like "base/quote" or "base-quote" (e.g. BTC/USD)
+// limit: the amount of items to return. Must be an integer from 1 to 1000.
+func (cli *Client) GetHistoricalOrderBooks(ctx context.Context, exchange, pair string, startTime, endTime time.Time,
+	limit int) ([]HistoricalOrderBook, error) {
+	base, quote, err := pairSeparator(pair)
+	if err != nil {
+		return nil, fmt.Errorf("shrimpygo failed to retrieve historical orderbooks: %w", err)
+	}
+	return getHistoricalOrderBooks(cli, ctx, exchange, base, quote, startTime, endTime, limit)
+}
+
+// GetHistoricalTrades retrieves historical trades based on the exchange, start and end times, and currency pair
+// passed in. Data is returned as lists of HistoricalTrade objects as demonstrated in the examples.
+// pair: the currency pair you're interested in, it could be either like "base/quote" or "base-quote" (e.g. BTC/USD)
+// limit: the amount of items to return. Must be an integer from 1 to 1000.
+func (cli *Client) GetHistoricalTrades(ctx context.Context, exchange, pair string, startTime, endTime time.Time,
+	limit int) ([]HistoricalTrade, error) {
+	base, quote, err := pairSeparator(pair)
+	if err != nil {
+		return nil, fmt.Errorf("shrimpygo failed to retrieve historical trades: %w", err)
+	}
+	return getHistoricalTrades(cli, ctx, exchange, base, quote, startTime, endTime, limit)
+}
+
+func pairSeparator(pair string) (base, quote string, err error) {
+	if strings.Contains("/", pair) {
+		p := strings.Split(pair, "/")
+		base = p[0]
+		quote = p[1]
+		return
+	} else if strings.Contains(pair, "-") {
+		p := strings.Split(pair, "-")
+		base = p[0]
+		quote = p[1]
+		return
+	}
+
+	err = fmt.Errorf("failed to extract baseSybmol & quoteSymbol from the pair: 'pair' must be provided either like " +
+		"'base/quote' or 'base-quote'")
+	return
 }
