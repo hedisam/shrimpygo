@@ -19,8 +19,11 @@ type historicalCount struct {
 func getHistoricalCandles(cli *Client, ctx context.Context, exchange, baseSymbol, quoteSymbol, interval string, limit int,
 	startTime, endTime time.Time) ([]HistoricalCandlestick, error) {
 	var candles []HistoricalCandlestick
+
+
 	path := fmt.Sprintf("%s?exchange=%s&baseTradingSymbol=%s&quoteTradingSymbol=%s&startTime=%v&endTime=%v"+
-		"&limit=%d&interval=%s", getHistCandlesApi, exchange, baseSymbol, quoteSymbol, startTime, endTime, limit, interval)
+		"&limit=%d&interval=%s", getHistCandlesApi, exchange, baseSymbol, quoteSymbol,
+		timeToDate(startTime), timeToDate(endTime), limit, interval)
 
 	err := rest.HttpGet(ctx, path, cli.config, rest.NewDecoderFunc(&candles))
 	if err != nil {
@@ -34,7 +37,7 @@ func getHistoricalCount(cli *Client, ctx context.Context, exchange, dataType, ba
 	startTime, endTime time.Time) (int, error) {
 	var count historicalCount
 	path := fmt.Sprintf("%s?type=%s&exchange=%s&baseTradingSymbol=%s&quoteTradingSymbol=%s&startTime=%v&endTime=%v",
-		getHistCountApi, dataType, exchange, baseSymbol, quoteSymbol, startTime, endTime)
+		getHistCountApi, dataType, exchange, baseSymbol, quoteSymbol, timeToDate(startTime), timeToDate(endTime))
 
 	err := rest.HttpGet(ctx, path, cli.config, rest.NewDecoderFunc(&count))
 	if err != nil {
@@ -68,7 +71,7 @@ func getHistoricalOrderBooks(cli *Client, ctx context.Context, exchange, baseSym
 	startTime, endTime time.Time, limit int) ([]HistoricalOrderBook, error) {
 	var orderBooks []HistoricalOrderBook
 	path := fmt.Sprintf("%s?exchange=%s&baseTradingSymbol=%s&quoteTradingSymbol=%s&startTime=%v&endTime=%v&limit=%d",
-		getHistOrderBooksApi, exchange, baseSymbol, quoteSymbol, startTime, endTime, limit)
+		getHistOrderBooksApi, exchange, baseSymbol, quoteSymbol, timeToDate(startTime), timeToDate(endTime), limit)
 
 	err := rest.HttpGet(ctx, path, cli.config, rest.NewDecoderFunc(&orderBooks))
 	if err != nil {
@@ -82,7 +85,7 @@ func getHistoricalTrades(cli *Client, ctx context.Context, exchange, baseSymbol,
 	startTime, endTime time.Time, limit int) ([]HistoricalTrade, error) {
 	var trades []HistoricalTrade
 	path := fmt.Sprintf("%s?exchange=%s&baseTradingSymbol=%s&quoteTradingSymbol=%s&startTime=%v&endTime=%v&limit=%d",
-		getHistTradesApi, exchange, baseSymbol, quoteSymbol, startTime, endTime, limit)
+		getHistTradesApi, exchange, baseSymbol, quoteSymbol, timeToDate(startTime), timeToDate(endTime), limit)
 
 	err := rest.HttpGet(ctx, path, cli.config, rest.NewDecoderFunc(&trades))
 	if err != nil {
@@ -90,4 +93,9 @@ func getHistoricalTrades(cli *Client, ctx context.Context, exchange, baseSymbol,
 	}
 
 	return trades, nil
+}
+
+func timeToDate(t time.Time) string {
+	y, m, d := t.Date()
+	return fmt.Sprintf("%d-%d-%d", y, m, d)
 }

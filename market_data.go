@@ -6,12 +6,6 @@ import (
 	"github.com/hedisam/shrimpygo/internal/rest"
 )
 
-const (
-	BaseSymbol = "baseSymbol"
-	QuoteSymbol = "quoteSymbol"
-	Limit 	= "limit"
-)
-
 func getTicker(cli *Client, ctx context.Context, exchange string) ([]Ticker, error) {
 	var tickers []Ticker
 
@@ -55,13 +49,4 @@ func getCandles(cli *Client, ctx context.Context, exchange, baseSymbol, quoteSym
 	return candles, nil
 }
 
-func QueryParams(name string, params ...string) string {
-	query := name + "="
-	for i, param := range params {
-		query += param
-		if i < len(params) - 1 {
-			query += ","
-		}
-	}
-	return query
-}
+

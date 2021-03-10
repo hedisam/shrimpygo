@@ -98,7 +98,7 @@ type HistoricalOrderBook struct {
 	// The id of the limit order !!! (from the docs: https://developers.shrimpy.io/docs/#historical-trade)
 	Time string `json:"time"`
 	// The best asks for the market. (ascending order)
-	Asks HistOrderBookItem `json:"asks"`
+	Asks []HistOrderBookItem `json:"asks"`
 	// The best bids for the market. (descending order)
 	Bids []HistOrderBookItem `json:"bids"`
 }
